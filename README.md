@@ -73,7 +73,7 @@ For a more convincing demo, I switched to a real continuous drone video where By
 
 Car detection showed very good metric with 84.3% mAP, which makes sense as cars are the most represented class here. Human detection (pedestrian+people combined) has around 50% mAP, which is reasonable for such a challenging aerial dataset. Inference runs at approximately 169 FPS, making it well-suited for real-time applications. All metrics were extracted directly from the model output rather than hardcoded. Confusion matrix, PR curve, F1 curve saved from training run and attached to the outputs_pics folder.
 
-## Sample Outputs
+### Sample Outputs
 
 ### Detection Results
 ![Result 1](outputs_pics/result_1.jpg)
@@ -83,23 +83,33 @@ Car detection showed very good metric with 84.3% mAP, which makes sense as cars 
 ### Metrics Chart
 ![Metrics](outputs_pics/metrics.PNG)
 
-## Tracking Outputs
+### Tracking Outputs
 - [ByteTrack on VisDrone sequences](outputs_tracking_video/pics_tracking_output.avi)
 - [ByteTrack on real drone video](outputs_tracking_video/real_drone_tracked.avi)
 - [ByteTrack on another real drone video](outputs_tracking_video/real_drone_tracked2.avi)
 - [BoT-SORT on real drone video (comparison)](outputs_tracking_video/real_drone_tracked2b.avi)
 
-## Strengths
+### Strengths
 - Excellent car detection (84.3% mAP)
 - Fast inference suitable for real-time use (~169 FPS)
 - Clean inference filtering without touching training data
 - ByteTrack integration with minimal code
 
-## Limitations
+### Limitations
 - Struggles with heavily occluded tiny humans
 - Tracking IDs inconsistent on image sequences (not real video)
 - Higher resolution (1280px) could improve small object detection further
 - People vs pedestrian ambiguity affects human counting accuracy
+
+### Challenges Faced
+
+1. Kaggle phone verification was required to connect to internet, but verification didn't work, forcing a switch to Google Colab mid-setup. But the session lost all trained weights mid-run, had to retrain from scratch. Learned to always download the weights from output immediately after training.
+2. First training run used imgsz=640 which missed tiny aerial objects. Stopped and restarted with imgsz=960.
+3. VisDrone test-dev mixes frames from completely different drone flights, making ByteTrack reset every frame. Had to find and upload a real drone video separately to demonstrate proper continuous tracking.
+ByteTrack assigns and loses IDs frequently on image sequences since there's no real motion between frames. Improved significantly on real continuous video.
+4. First tracking video used mp4v codec which threw silent write errors. Switched to XVID with .avi format to fix it.
+5. Hardcoded canvas dimensions (1280x720) squished videos that had different original aspect ratios. Fixed by reading original dimensions from the video file directly.
+6. Some files were larger than 25MB so couldn't be uploaded via drag and drop in the browser. Had to use the command line with Git LFS to push it to the repository.
 
 ## Tech Stack
 - Detection: YOLOv8s
