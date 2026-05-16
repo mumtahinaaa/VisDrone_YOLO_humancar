@@ -110,12 +110,20 @@ Car detection showed very good metric with 84.3% mAP, which makes sense as cars 
 ## Project Structure
 ```
 VisDrone_YOLO_humancar/
+├── notebooks/                    # Kaggle training notebook
+├── outputs_pics/                 # Detection result images with bounding boxes
+├── outputs_tracking_video/       # Tracking output videos
+│   ├── pics_tracking_output.avi  # ByteTrack on VisDrone image sequences
+│   ├── real_drone_tracked.avi    # ByteTrack on real drone video 1
+│   ├── real_drone_tracked2.avi   # ByteTrack on real drone video 2
+│   └── real_drone_tracked2b.avi  # BoT-SORT on real drone video (comparison)
+├── sample_images/                # Raw dataset sample images for visualization
+├── weights/                      # Trained model weights
+│   └── best.pt
 ├── README.md
-├── outputs/          # Sample detection results and tracking videos
-├── weights/          # Trained model weights (best.pt)
-└── notebooks/        # Kaggle training notebook
+├── requirements.txt
+└── visdrone.yaml
 ```
-
 ## How to Run
 
 ### Install dependencies
