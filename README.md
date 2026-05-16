@@ -12,39 +12,48 @@ A computer vision pipeline for detecting humans and cars in drone/aerial imagery
 - Task 04: Object Tracking (ByteTrack) (Bonus Task)
 - Task 05: Evaluation & Visualization
 
-## Real Workflow & Engineering Decisions
-
-### Environment Setup
-Getting the environment right took some trial and error. We started with Kaggle but hit a wall — phone verification was required to enable internet, which blocked package installation. Switched to Google Colab, but the free tier disconnected mid-training and we lost the weights entirely. Eventually settled on Kaggle with T4 x2 GPU after getting verification sorted, which gave us stable training with 30 hours of free GPU time. Key lesson: always download best.pt the moment training finishes.
+## Workflow & Engineering Decisions
 
 ### (Task 01) Dataset Understanding & Preprocessing
 VisDrone 2019 is a large-scale aerial detection dataset with 6,471 training images, 548 validation images, and 10 object categories. The dataset comes fully pre-labeled, so no manual annotation was needed. Each image has a corresponding label file containing bounding box coordinates and class IDs.
 
-The dataset presented several real challenges. Objects are extremely small because the drone is at high altitude — people are sometimes just a few pixels wide. Dense crowds and parking lots cause heavy occlusion. There's also a significant class imbalance: cars appear 14,064 times in the validation set while buses appear only 251 times. An interesting quirk of VisDrone is that humans are split into two separate classes — "pedestrian" (walking) and "people" (standing, sitting, in groups) — which complicates counting.
+The dataset presented several real challenges. 
+- Objects are extremely small because the drone is at high altitude, and people are sometimes just a few pixels wide. 
+- Dense crowds and parking lots make the detection hard. 
+- There's also a significant class imbalance: cars appear 14,064 times in the validation set while buses appear only 251 times. 
+- An interesting observation was that humans are split into two separate classes: "pedestrian" (walking) and "people" (standing, sitting, in groups), which complicated counting humans for the task.
 
-For preprocessing, we relied entirely on YOLOv8's built-in augmentation pipeline: mosaic (stitches 4 images together), horizontal flipping, random scaling, and HSV jitter for lighting variation. This handled everything automatically during training.
+For preprocessing, I relied entirely on YOLOv8's built-in augmentation pipeline: mosaic (stitches 4 images together), horizontal flipping, random scaling, and HSV jitter for lighting variation. This handled everything automatically during training.
+
+### Sample Dataset Images
+[Sample 1](sample_images/0000006_00159_d_0000001.jpg)
+[Sample 2](sample_images/0000006_00611_d_0000002.jpg)
+[Sample 3](sample_images/0000006_01111_d_0000003.jpg)
+[Sample 4](sample_images/0000006_01275_d_0000004.jpg)
+[Sample 5](sample_images/0000006_01659_d_0000004.jpg)
 
 ### (Task 02) Model Training
-We chose YOLOv8s as the base model — it strikes the best balance between speed and accuracy for real-time drone applications, and comes pretrained on COCO which gave us a strong starting point.
+I chose YOLOv8s as the base model as it gives a good balance between speed and accuracy for real-time drone applications, and comes pretrained on COCO which gave a strong starting point.
 
-The first training run used the default imgsz=640, but we stopped it early after realizing that aggressively downsampling high-resolution aerial footage causes the model to miss tiny objects. Restarted with imgsz=960, which gave the model much more detail to work with. We also made a deliberate decision to train on all 10 classes rather than filtering the labels beforehand — this preserved dataset integrity and eliminated any risk of corrupting the annotation files. Final config: imgsz=960, batch=8, epochs=50, patience=10 for early stopping.
+The first training run used the default imgsz=640, but it was stopped early after realizing that aggressively downsampling high-resolution aerial footage causes the model to miss tiny objects. Restarted with imgsz=960, which gave the model much more detail to work with. Also, instead of filtering the labels beforehand, the model got trained on all 10 classes. This preserved dataset integrity and eliminated any risk of corrupting the annotation files. 
+- Final config: imgsz=960, batch=8, epochs=50, patience=10 for early stopping.
 
 ### (Task 03) Human & Car Detection with Counting
-Rather than retraining a separate model for just humans and cars, we used YOLO's native classes argument at inference time — passing classes=[0, 1, 3] to filter detections to pedestrian, people, and car only. This is cleaner, faster, and carries no risk of data manipulation.
+Rather than retraining a separate model for just humans and cars, we used YOLO's native classes argument at inference time: passing classes=[0, 1, 3] to filter detections to pedestrian, people, and car only. This is cleaner, faster, and carries no risk of data manipulation.
 
 Since VisDrone splits humans into two classes, the total human count combines both: pedestrian detections + people detections. Bounding boxes and the human count overlay are drawn directly onto the output images using OpenCV.
 
 Sample results across 5 test images:
-Image 1: Humans=1, Cars=41
-Image 2: Humans=5, Cars=14
-Image 3: Humans=40, Cars=0
-Image 4: Humans=1, Cars=5
-Image 5: Humans=4, Cars=42
+Image 1: Humans=4
+Image 2: Humans=8
+Image 3: Humans=3
+Image 4: Humans=1
+Image 5: Humans=0
 
 ### (Task 04) Object Tracking
-ByteTrack was implemented using Ultralytics' built-in tracker — literally one line of code change from predict to track. We first tested it on VisDrone image sequences, but the result looked like a slideshow because the test-dev folder mixes images from completely different drone flights. We attempted to filter by sequence ID "0000001_" but found no matches in the test-dev set, so fell back to a sorted sequence. To make the output more visually clear, we used frame duplication to slow playback down.
+ByteTrack was implemented using Ultralytics' built-in tracker. I first tested it on VisDrone image sequences, but the result looked like a slideshow because the test-dev folder mixes images from completely different drone flights. I attempted to filter by similar looking images, but still the model couldn't really keep up with tracking the same object as in each frame the camera angle chanegs significantly.
 
-For a more convincing demo, we switched to a real continuous drone video where ByteTrack could actually maintain tracking IDs across frames naturally. We also compared ByteTrack against BoT-SORT — both performed similarly, but ByteTrack was kept as it is the more widely adopted standard. OC-SORT was considered for its stronger handling of fast-moving objects but skipped due to time constraints.
+For a more convincing demo, I switched to a real continuous drone video where ByteTrack could actually maintain tracking IDs across frames naturally. I also compared ByteTrack against BoT-SORT, and noticed that both performed similarly. So, ByteTrack was kept as it is the more widely adopted standard. OC-SORT was considered for its stronger handling of fast-moving objects but skipped due to time constraints.
 
 ### (Task 05) Evaluation & Visualization
 
@@ -62,7 +71,7 @@ For a more convincing demo, we switched to a real continuous drone video where B
 | Motor | 56.4% | 61.8% | 56.5% |
 | **Overall** | **47.8%** | **58.9%** | **47.2%** |
 
-Car detection came out exceptionally strong at 84.3% mAP, which makes sense given cars are the most represented class. Human detection (pedestrian + people combined) sits around 50%, which is reasonable for such a challenging aerial dataset. Inference runs at approximately 169 FPS, making it well-suited for real-time applications. All metrics were extracted directly from the model output rather than hardcoded. Confusion matrix, PR curve, F1 curve saved from training run.
+Car detection showed very good metric with 84.3% mAP, which makes sense as cars are the most represented class here. Human detection (pedestrian+people combined) has around 50% mAP, which is reasonable for such a challenging aerial dataset. Inference runs at approximately 169 FPS, making it well-suited for real-time applications. All metrics were extracted directly from the model output rather than hardcoded. Confusion matrix, PR curve, F1 curve saved from training run and attached to the outputs_pics folder.
 
 ## Sample Outputs
 
