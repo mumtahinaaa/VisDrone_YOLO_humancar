@@ -50,15 +50,17 @@ For a more convincing demo, we switched to a real continuous drone video where B
 
 | Class | mAP@0.5 | Precision | Recall |
 |---|---|---|---|
-| All | 47.6% | 58.0% | 47.6% |
-| Pedestrian | 55.2% | 62.8% | 53.4% |
-| People | 42.4% | 63.0% | 39.6% |
-| Bicycle | 24.6% | 38.4% | 28.4% |
-| Car | 84.3% | 78.5% | 82.9% |
-| Van | 51.6% | 57.3% | 52.2% |
-| Truck | 44.6% | 57.8% | 43.7% |
-| Bus | 61.2% | 76.3% | 53.9% |
-| Motor | 56.5% | 61.3% | 57.0% |
+| Pedestrian | 55.9% | 64.2% | 53.0% |
+| People | 42.4% | 63.1% | 40.6% |
+| Bicycle | 24.9% | 41.6% | 26.5% |
+| Car | 84.6% | 78.5% | 82.9% |
+| Van | 50.7% | 58.7% | 51.0% |
+| Truck | 45.8% | 55.9% | 45.2% |
+| Tricycle | 38.1% | 50.6% | 39.9% |
+| Awning-tricycle | 18.9% | 37.7% | 23.9% |
+| Bus | 60.5% | 76.7% | 52.5% |
+| Motor | 56.4% | 61.8% | 56.5% |
+| **Overall** | **47.8%** | **58.9%** | **47.2%** |
 
 Car detection came out exceptionally strong at 84.3% mAP, which makes sense given cars are the most represented class. Human detection (pedestrian + people combined) sits around 50%, which is reasonable for such a challenging aerial dataset. Inference runs at approximately 169 FPS, making it well-suited for real-time applications. All metrics were extracted directly from the model output rather than hardcoded. Confusion matrix, PR curve, F1 curve saved from training run.
 
@@ -70,7 +72,7 @@ Car detection came out exceptionally strong at 84.3% mAP, which makes sense give
 ![Result 4](outputs_pics/result_4.jpg)
 
 ### Metrics Chart
-![Metrics](outputs_pics/metrics_chart.png)
+![Metrics](outputs_pics/metrics.png)
 
 ## Tracking Outputs
 - [ByteTrack on VisDrone sequences](outputs_tracking_video/pics_tracking_output.avi)
