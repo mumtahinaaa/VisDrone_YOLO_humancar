@@ -60,7 +60,23 @@ For a more convincing demo, we switched to a real continuous drone video where B
 | Bus | 61.2% | 76.3% | 53.9% |
 | Motor | 56.5% | 61.3% | 57.0% |
 
-Car detection came out exceptionally strong at 84.3% mAP, which makes sense given cars are the most represented class. Human detection (pedestrian + people combined) sits around 50%, which is reasonable for such a challenging aerial dataset. Inference runs at approximately 169 FPS, making it well-suited for real-time applications. All metrics were extracted directly from the model output rather than hardcoded. Confusion matrix, PR curve, F1 curve saved from training run
+Car detection came out exceptionally strong at 84.3% mAP, which makes sense given cars are the most represented class. Human detection (pedestrian + people combined) sits around 50%, which is reasonable for such a challenging aerial dataset. Inference runs at approximately 169 FPS, making it well-suited for real-time applications. All metrics were extracted directly from the model output rather than hardcoded. Confusion matrix, PR curve, F1 curve saved from training run.
+
+## Sample Outputs
+
+### Detection Results
+![Result 1](outputs_pics/result_1.jpg)
+![Result 2](outputs_pics/result_2.jpg)
+![Result 4](outputs_pics/result_4.jpg)
+
+### Metrics Chart
+![Metrics](outputs_pics/metrics_chart.png)
+
+## Tracking Outputs
+- [ByteTrack on VisDrone sequences](outputs_tracking_video/pics_tracking_output.avi)
+- [ByteTrack on real drone video](outputs_tracking_video/real_drone_tracked.avi)
+- [ByteTrack on another real drone video](outputs_tracking_video/real_drone_tracked2.avi)
+- [BoT-SORT on real drone video (comparison)](outputs_tracking_video/real_drone_tracked2b.avi)
 
 ## Strengths
 - Excellent car detection (84.3% mAP)
