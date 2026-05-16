@@ -72,7 +72,7 @@ Car detection came out exceptionally strong at 84.3% mAP, which makes sense give
 ![Result 4](outputs_pics/result_4.jpg)
 
 ### Metrics Chart
-![Metrics](outputs_pics/metrics.png)
+![Metrics](outputs_pics/metrics.PNG)
 
 ## Tracking Outputs
 - [ByteTrack on VisDrone sequences](outputs_tracking_video/pics_tracking_output.avi)
